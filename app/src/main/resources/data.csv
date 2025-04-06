@@ -1,0 +1,6 @@
+id,name,coordinates_x,coordinates_y,creationDate,area,numberOfRooms,furnish,view,transport,house_name,house_year,house_numberOfFloors
+1,Flat1,100,50,2024-04-01T12:00:00,500.5,3,DESIGNER,STREET,NORMAL,House1,500,10
+2,Flat2,200,60,2024-04-01T12:05:00,450.0,2,FINE,,FEW,House2,800,5
+3,Flat3,300,70,2024-04-01T12:10:00,626.0,4,BAD,PARK,LITTLE,,,
+4,Flat4,400,80,2024-04-01T12:15:00,300.0,1,DESIGNER,GOOD,NONE,House3,959,77
+5,Flat5,500,90,2024-04-01T12:20:00,550.5,2,FINE,NORMAL,NORMAL,House4,600,20
