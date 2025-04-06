@@ -1,135 +1,97 @@
 package itmo.lab5.cli.commands;
 
-import itmo.lab5.models.*;
-import itmo.lab5.models.enums.*;
-import itmo.lab5.interfaces.Command;
-import itmo.lab5.cli.CommandContext;
-
 import java.util.*;
+
+import itmo.lab5.cli.helpers.*;
+import itmo.lab5.cli.CommandContext;
+import itmo.lab5.interfaces.Command;
+import itmo.lab5.models.enums.*;
+import itmo.lab5.models.*;
 
 public class UpdateCommand implements Command {
   private final Scanner scanner = new Scanner(System.in);
+  private final ReaderUtil inputReader = new ReaderUtil(scanner);
 
   @Override
   public String execute(String[] args, CommandContext context) {
-    if (args.length < 1)
+    if (args.length < 1) {
       return "Usage: update id {element}";
+    }
+
+    Map<Integer, Flat> collection = null;
 
     int idToUpdate;
     try {
-      idToUpdate = Integer.parseInt(args[1]);
+      idToUpdate = Integer.parseInt(args[0]);
     } catch (NumberFormatException e) {
-      return "Invalid ID!";
+      return "Invalid ID format.";
     }
 
-    Map<Integer, Flat> collection = (Map<Integer, Flat>) context.get("collection");
+    try {
+      collection = (Map<Integer, Flat>) context.get("collection");
+    } catch (ClassCastException e) {
+      return "There's an error while trying to parse collection";
+    }
+
     if (!collection.containsKey(idToUpdate)) {
-      return "No flat with such ID: " + idToUpdate;
+      return "No flat with ID: " + idToUpdate;
     }
 
     Flat oldFlat = collection.get(idToUpdate);
-    Flat updatedFlat = readFlat(idToUpdate, oldFlat);
-    collection.put(idToUpdate, updatedFlat);
-    return "Flat with ID " + idToUpdate + " updated.";
-  }
 
-  private Flat readFlat(int id, Flat oldFlat) {
-    System.out.println("- New information for Flat #" + id);
-    String name = readString("Enter new name: ", false, oldFlat.getName());
-    Coordinates coordinates = readCoordinates(oldFlat.getCoordinates());
-    Date creationDate = new Date();
-    Double area = readNumber("Enter new square: ", 0.0, 626.0, Double::parseDouble, oldFlat.getArea());
-    int rooms = readNumber("Enter new rooms count: ", 1, Integer.MAX_VALUE, Integer::parseInt,
+    System.out.println("Updating flat with ID: " + idToUpdate);
+    String name = inputReader.promptString("- Enter name:", false, oldFlat.getName());
+
+    System.out.println("- Coordinates:");
+    int x = inputReader.promptNumber("\t Enter x:", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt,
+        oldFlat.getCoordinates().getX());
+    Long y = inputReader.promptNumber("\t Enter y:", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong,
+        oldFlat.getCoordinates().getY());
+    Coordinates coordinates = new Coordinates(x, y);
+
+    Double area = inputReader.promptNumber("\t Enter square:", 0.0, 626.0, Double::parseDouble, oldFlat.getArea());
+    int rooms = inputReader.promptNumber("\t Enter rooms count:", 1, Integer.MAX_VALUE, Integer::parseInt,
         oldFlat.getNumberOfRooms());
-    Furnish furnish = readEnum("Enter new furnish: ", Furnish.class, oldFlat.getFurnish());
-    View view = readEnumNullable("Enter new view (or empty string)", View.class, oldFlat.getView());
-    Transport transport = readEnum("Enter new transport: ", Transport.class, oldFlat.getTransport());
-    House house = readHouse(oldFlat.getHouse());
 
-    return new Flat(id, name, coordinates, creationDate, area, rooms, furnish, view, transport, house);
-  }
+    System.out.println("- Furnish:");
+    Furnish furnish = inputReader.promptEnum("\t Enter furnish type:", Furnish.class, oldFlat.getFurnish());
 
-  private Coordinates readCoordinates(Coordinates oldCoords) {
-    int x = readNumber("Введите координату X", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt,
-        oldCoords.getX());
-    Long y = readNumber("Введите координату Y", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, oldCoords.getY());
-    return new Coordinates(x, y);
-  }
+    System.out.println("- View:");
+    View view = inputReader.promptEnumNullable("\t Enter view type:", View.class, oldFlat.getView());
 
-  private House readHouse(House oldHouse) {
-    System.out.print("Введите название дома (" + (oldHouse != null ? oldHouse.getName() : "null")
-        + ", пусто — не изменять, полностью пусто — null): ");
-    String name = scanner.nextLine().trim();
-    if (name.isEmpty())
-      return oldHouse;
-    if (name.equals("null"))
-      return null;
+    System.out.println("- Transport:");
+    Transport transport = inputReader.promptEnum("\t Enter transport type:", Transport.class, oldFlat.getTransport());
 
-    int year = readNumber("Введите год постройки", 1, 959, Integer::parseInt, oldHouse.getYear());
-    long floors = readNumber("Введите количество этажей", 1L, 77L, Long::parseLong, oldHouse.getNumberOfFloors());
+    System.out.println("- House:");
+    System.out.print("\t Enter house name: ");
+    String houseName = scanner.nextLine().trim();
 
-    return new House(name, year, floors);
-  }
+    House house = oldFlat.getHouse();
+    if (!houseName.isEmpty()) {
+      int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt,
+          (house != null ? house.getYear() : 1));
 
-  private String readString(String message, boolean allowEmpty, String oldValue) {
-    while (true) {
-      System.out.print(message + " (" + oldValue + "): ");
-      String input = scanner.nextLine().trim();
-      if (input.isEmpty())
-        return oldValue;
-      if (!input.isEmpty() || allowEmpty)
-        return input;
-      System.out.println("Строка не может быть пустой.");
+      long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong,
+          (house != null ? house.getNumberOfFloors() : 1L));
+
+      house = new House(houseName, year, floors);
     }
-  }
 
-  private <T extends Enum<T>> T readEnum(String message, Class<T> enumClass, T oldValue) {
-    while (true) {
-      System.out.println(message + " (" + oldValue + ", варианты: "
-          + String.join(", ", Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList()) + "):");
-      String input = scanner.nextLine().trim();
-      if (input.isEmpty())
-        return oldValue;
-      try {
-        return Enum.valueOf(enumClass, input);
-      } catch (IllegalArgumentException e) {
-        System.out.println("Неверное значение. Повторите ввод.");
-      }
-    }
-  }
+    Date creationDate = new Date();
 
-  private <T extends Enum<T>> T readEnumNullable(String message, Class<T> enumClass, T oldValue) {
-    while (true) {
-      System.out.println(message + " (" + (oldValue != null ? oldValue : "null") + ", варианты: "
-          + String.join(", ", Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList()) + "):");
-      String input = scanner.nextLine().trim();
-      if (input.isEmpty())
-        return oldValue;
-      try {
-        return Enum.valueOf(enumClass, input);
-      } catch (IllegalArgumentException e) {
-        System.out.println("Неверное значение. Повторите ввод.");
-      }
-    }
-  }
+    Flat updatedFlat = new Flat(
+        idToUpdate,
+        name,
+        coordinates,
+        creationDate,
+        area,
+        rooms,
+        furnish,
+        view,
+        transport,
+        house);
 
-  private <T extends Comparable<T>> T readNumber(String message, T min, T max, Parser<T> parser, T oldValue) {
-    while (true) {
-      System.out.print(message + " (" + oldValue + "): ");
-      String input = scanner.nextLine().trim();
-      if (input.isEmpty())
-        return oldValue;
-      try {
-        T value = parser.parse(input);
-        if (value.compareTo(min) >= 0 && value.compareTo(max) <= 0)
-          return value;
-      } catch (Exception ignored) {
-      }
-      System.out.println("Некорректный ввод. Повторите попытку.");
-    }
-  }
-
-  interface Parser<T> {
-    T parse(String input) throws Exception;
+    collection.put(idToUpdate, updatedFlat);
+    return "Flat with ID " + idToUpdate + " was successfully updated.";
   }
 }

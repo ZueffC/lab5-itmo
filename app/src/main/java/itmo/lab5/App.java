@@ -36,6 +36,7 @@ public class App {
                 .register("remove_key", new RemoveKeyCommand())
                 .register("history", new HistoryCommand())
                 .register("insert", new InsertCommand())
+                .register("update", new UpdateCommand())
                 .build();
 
         try {

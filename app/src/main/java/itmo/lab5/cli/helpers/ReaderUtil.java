@@ -13,7 +13,7 @@ public class ReaderUtil {
   public String promptString(String message, boolean allowEmpty, String oldValue) {
     while (true) {
       System.out.print(message);
-      if (!oldValue.isEmpty() || oldValue != null)
+      if (oldValue != null)
         System.out.print(" (" + oldValue + "): ");
 
       String input = scanner.nextLine().trim();
@@ -30,9 +30,9 @@ public class ReaderUtil {
   public <T extends Enum<T>> T promptEnum(String message, Class<T> enumClass, T oldValue) {
     while (true) {
       if (oldValue != null)
-        System.out.print("Now it's: " + oldValue + ". ");
+        System.out.println("Now it's: " + oldValue + ". ");
 
-      System.out.println(
+      System.out.print(
           message + "(options: " +
               String.join(", ", Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList()) +
               "): ");
@@ -53,9 +53,9 @@ public class ReaderUtil {
   public <T extends Enum<T>> T promptEnumNullable(String message, Class<T> enumClass, T oldValue) {
     while (true) {
       if (oldValue != null)
-        System.out.print("Now it's: " + oldValue + ". ");
+        System.out.println("Now it's: " + oldValue + ". ");
 
-      System.out.println(
+      System.out.print(
           message + "(options: " +
               String.join(", ", Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList()) +
               "): ");
@@ -77,7 +77,9 @@ public class ReaderUtil {
       System.out.print(message + " (" + oldValue + "): ");
       String input = scanner.nextLine().trim();
       if (input.isEmpty())
-        return oldValue;
+        if (oldValue != null)
+          return oldValue;
+
       try {
         T value = parser.parse(input);
         if (value.compareTo(min) >= 0 && value.compareTo(max) <= 0)

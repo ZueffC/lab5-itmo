@@ -20,7 +20,7 @@ public class House {
   }
 
   public long getNumberOfFloors() {
-    return this.getNumberOfFloors();
+    return this.numberOfFloors;
   }
 
   public String toString() {
