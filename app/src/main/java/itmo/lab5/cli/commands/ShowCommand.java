@@ -14,7 +14,7 @@ public class ShowCommand implements Command {
     try {
       collection = (HashMap<Integer, Flat>) context.get("collection");
     } catch (ClassCastException e) {
-      System.out.println("Can't parse collection!");
+      return "Can't parse collection!";
     }
 
     if (collection.isEmpty() || collection.size() == 0) {

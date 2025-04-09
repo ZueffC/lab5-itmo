@@ -37,6 +37,7 @@ public class App {
                 .register("history", new HistoryCommand())
                 .register("insert", new InsertCommand())
                 .register("update", new UpdateCommand())
+                .register("save", new SaveCommand())
                 .build();
 
         try {
@@ -50,6 +51,7 @@ public class App {
         context.set("registry", registry);
         context.set("collection", flats);
         context.set("history", history);
+        context.set("path", dataFilePath.toString());
 
         var scanner = new Scanner(System.in);
 
