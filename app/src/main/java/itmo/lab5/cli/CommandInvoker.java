@@ -3,7 +3,7 @@ package itmo.lab5.cli;
 import itmo.lab5.cli.helpers.History;
 import itmo.lab5.interfaces.*;
 
-class CommandInvoker {
+public class CommandInvoker {
   private final CommandRegistry registry;
   private final CommandContext context;
   private final History history;

@@ -33,9 +33,8 @@ public class UpdateCommand implements Command {
       return "There's an error while trying to parse collection";
     }
 
-    if (!collection.containsKey(idToUpdate)) {
+    if (!collection.containsKey(idToUpdate))
       return "No flat with ID: " + idToUpdate;
-    }
 
     Flat oldFlat = collection.get(idToUpdate);
 

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.BufferedWriter;
 import java.util.HashMap;
+import java.text.SimpleDateFormat;
 
 public class SaveCommand implements Command {
   @Override
@@ -30,19 +31,28 @@ public class SaveCommand implements Command {
     }
   }
 
+  static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
   public String saveCollectionToFile(HashMap<Integer, Flat> flats, String filename) {
     try (FileOutputStream fos = new FileOutputStream(filename);
         OutputStreamWriter osw = new OutputStreamWriter(fos);
         BufferedWriter writer = new BufferedWriter(osw)) {
 
-      writer.write("id,name,x,y,area,numberOfRooms,furnish,view,transport,houseName,houseYear,houseFloors\n");
-
       for (Flat flat : flats.values()) {
-        String line = String.format("%d,%s,%d,%d,%.2f,%d,%s,%s,%s,%s,%d,%d\n",
+        String date = "";
+
+        try {
+          date = dateFormat.format(flat.getCreationDate()).toString();
+        } catch (Exception e) {
+          System.out.println(e.getMessage());
+        }
+
+        String line = String.format("%d,%s,%d,%d,%s,%.2f,%d,%s,%s,%s,%s,%d,%d\n",
             flat.getId(),
             flat.getName(),
             flat.getCoordinates().getX(),
             flat.getCoordinates().getY(),
+            date,
             flat.getArea(),
             flat.getNumberOfRooms(),
             flat.getFurnish(),

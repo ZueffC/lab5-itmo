@@ -5,14 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.*;
 
 import itmo.lab5.cli.CommandBuilder;
+import itmo.lab5.cli.CommandInvoker;
 import itmo.lab5.cli.CommandContext;
 import itmo.lab5.cli.CommandRegistry;
-import itmo.lab5.interfaces.Command;
 import itmo.lab5.cli.commands.*;
 import itmo.lab5.models.Flat;
 import itmo.lab5.parser.Reader;
@@ -38,6 +39,12 @@ public class App {
                 .register("insert", new InsertCommand())
                 .register("update", new UpdateCommand())
                 .register("save", new SaveCommand())
+                .register("execute_script", new ExecuteCommand())
+                .register("print_field_ascending_number_of_rooms", new FieldCommand())
+                .register("filter_less_than_view", new FilterCommand("less"))
+                .register("filter_greater_than_view", new FilterCommand("greater"))
+                .register("replace_if_lower", new ReplaceCommand("lower"))
+                .register("replace_if_greater", new ReplaceCommand("greater"))
                 .build();
 
         try {
@@ -53,29 +60,23 @@ public class App {
         context.set("history", history);
         context.set("path", dataFilePath.toString());
 
-        var scanner = new Scanner(System.in);
+        CommandInvoker invoker = new CommandInvoker(registry, context, history);
+        context.set("commandInvoker", invoker);
 
+        var scanner = new Scanner(System.in);
         while (true) {
             System.out.print("> ");
-
             String input = scanner.nextLine().trim();
             if (input.isEmpty())
                 continue;
 
             String[] args = input.split(" ");
             String commandName = args[0];
-            Command command = registry.getByName(commandName);
+            String[] commandArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
-            if (command != null) {
-                history.add(commandName);
-                var localArgs = args.length > 1 ? java.util.Arrays.copyOfRange(args, 1, args.length) : new String[0];
-                var response = command.execute(localArgs, context);
-                System.out.println(response);
-            } else {
-                System.out.println("Unknown command: " + commandName);
-            }
+            String response = invoker.executeCommand(commandName, commandArgs);
+            System.out.println(response);
         }
-
     }
 
     public static Path getDataFileFromEnv(String envVariable) throws IOException {
