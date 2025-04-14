@@ -10,11 +10,11 @@ import itmo.lab5.interfaces.Command;
  * When called, main loop will immediately stop.
  */
 public class ExitCommand implements Command {
-    
+
     /**
      * Executes the exit command, terminating the application.
      *
-     * @param args an array of arguments passed to the command
+     * @param args    an array of arguments passed to the command
      * @param context the command context that may contain additional data
      * @return an empty string
      */
