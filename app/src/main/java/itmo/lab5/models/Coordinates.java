@@ -1,5 +1,8 @@
 package itmo.lab5.models;
 
+/**
+ * Represents a point in the provided task.
+ */
 public class Coordinates {
   private int x;
   private Long y; // Поле не может быть null

@@ -1,10 +1,8 @@
 package itmo.lab5.cli.commands;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.function.Function;
 
 import itmo.lab5.cli.helpers.*;
 import itmo.lab5.cli.CommandContext;
@@ -12,84 +10,115 @@ import itmo.lab5.interfaces.Command;
 import itmo.lab5.models.enums.*;
 import itmo.lab5.models.*;
 
+/**
+ * This class implements the Command interface and provides
+ * functionality to insert a new Flat object into the collection.
+ * 
+ * This command can be executed in two modes: interactively, where the user is 
+ * prompted for input, or with command-line arguments, where parameters are 
+ * passed as key-value pairs. The command gathers all necessary information to 
+ * create a new flat and adds it to the collection.
+ * 
+ */
 public class InsertCommand implements Command {
-  private final Scanner scanner = new Scanner(System.in);
-  private final ReaderUtil inputReader = new ReaderUtil(scanner);
+    private final Scanner scanner = new Scanner(System.in);
+    private final ReaderUtil inputReader = new ReaderUtil(scanner);
 
-  @Override
-  public String execute(String[] args, CommandContext context) {
-    if (args.length == 0) {
-      return executeInteractive(context);
+    /**
+     * Executes the insert command, either interactively or with provided 
+     * arguments.
+     *
+     * @param args an array of arguments passed to the command; if empty, the command will execute interactively
+     * @param context the command context that contains the collection of flats
+     * @return a message indicating the result of the operation, or an error message if the collection cannot be parsed
+     */
+    @Override
+    public String execute(String[] args, CommandContext context) {
+        if (args.length == 0)
+            return executeInteractive(context);
+
+        return executeWithArgs(args, context);
     }
 
-    return executeWithArgs(args, context);
-  }
+    /**
+     * Executes the insert command interactively, prompting the user for input 
+     * to create a new flat.
+     *
+     * @param context the command context that contains the collection of flats
+     * @return a message indicating the result of the operation
+     */
+    private String executeInteractive(CommandContext context) {
+        Date creationDate = new Date();
+        String name = inputReader.promptString("- Enter name: ", false, null);
 
-  private String executeInteractive(CommandContext context) {
-    Date creationDate = new Date();
-    String name = inputReader.promptString("- Enter name: ", false, null);
+        System.out.println("- Coordinates ");
+        int x = inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt, null);
+        Long y = inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
+        var coordinates = new Coordinates(x, y);
 
-    System.out.println("- Coordinates ");
-    int x = inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt, null);
-    Long y = inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
-    var coordinates = new Coordinates(x, y);
+        Double area = inputReader.promptNumber("\t Enter square: ", 0.0, 626.0, Double::parseDouble, null);
+        int numberOfRooms = inputReader.promptNumber("\t Enter rooms count: ", 1, Integer.MAX_VALUE, Integer::parseInt, null);
 
-    Double area = inputReader.promptNumber("\t Enter square: ", 0.0, 626.0, Double::parseDouble, null);
-    int numberOfRooms = inputReader.promptNumber("\t Enter rooms count: ", 1, Integer.MAX_VALUE, Integer::parseInt,
-        null);
+        System.out.println("- Furnish");
+        Furnish furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
 
-    System.out.println("- Furnish");
-    Furnish furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        System.out.println("- View");
+        View view = inputReader.promptEnumNullable("\t Enter view type: ", View.class, null);
 
-    System.out.println("- View");
-    View view = inputReader.promptEnumNullable("\t Enter view type: ", View.class, null);
+        System.out.println("- Transport");
+        Transport transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
 
-    System.out.println("- Transport");
-    Transport transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
+        System.out.println("- House");
+        System.out.print("\t Enter house name: ");
+        String houseName = scanner.nextLine().trim();
 
-    System.out.println("- House");
-    System.out.print("\t Enter house name: ");
-    String houseName = scanner.nextLine().trim();
+        House house = null;
 
-    House house = null;
+        if (!houseName.isEmpty()) {
+            int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+            long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+            house = new House(houseName, year, floors);
+        }
 
-    if (!houseName.isEmpty()) {
-      int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
-      long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
-      house = new House(houseName, year, floors);
+        try {
+            HashMap<Integer, Flat> collection = (HashMap<Integer, Flat>) context.get("collection");
+            int newID = collection.size() + 1;
+            Flat flat = new Flat(
+                newID,
+                name,
+                coordinates,
+                creationDate,
+                area,
+                numberOfRooms,
+                furnish,
+                view,
+                transport,
+                house);
+
+            collection.put(newID, flat);
+        } catch (ClassCastException e) {
+            return "There's an error while trying to add new element. Collection is broken.";
+        }
+
+        return "New flat was successfully inserted!";
     }
 
-    try {
-      HashMap<Integer, Flat> collection = (HashMap<Integer, Flat>) context.get("collection");
-      int newID = collection.size() + 1;
-      Flat flat = new Flat(
-          newID,
-          name,
-          coordinates,
-          creationDate,
-          area,
-          numberOfRooms,
-          furnish,
-          view,
-          transport,
-          house);
-
-      collection.put(newID, flat);
-    } catch (ClassCastException e) {
-      return "There's an error while trying to add new element. Collection is broken.";
-    }
-
-    return "New flat was successfully inserted!";
-  }
-
+    /**
+     * Executes the insert command with provided arguments, creating a new flat 
+     * based on the key-value pairs.
+     *
+     * @param args an array of arguments passed to the command
+     * @param context the command context that contains the collection of flats
+     * @return a message indicating the result of the operation
+     */
   private String executeWithArgs(String[] args, CommandContext context) {
     HashMap<String, String> params = new HashMap<>();
 
     for (String arg : args) {
       String[] parts = arg.split("=", 2);
-      if (parts.length == 2) {
+
+      if (parts.length == 2)
         params.put(parts[0], parts[1]);
-      }
     }
 
     Date creationDate = new Date();
@@ -194,10 +223,10 @@ public class InsertCommand implements Command {
   public static <E extends Enum<E>> boolean isValidEnumValue(Class<E> enumClass, String value) {
     if (value == null)
       return false;
+
     for (E constant : enumClass.getEnumConstants()) {
-      if (constant.name().equals(value)) {
+      if (constant.name().equals(value))
         return true;
-      }
     }
     return false;
   }

@@ -19,9 +19,19 @@ import itmo.lab5.models.Flat;
 import itmo.lab5.parser.Reader;
 import itmo.lab5.cli.helpers.History;
 
+/**
+ * This class is an entry point of the application that manages a collection of
+ * {@code Flat} objects.
+ * The main method creates REPL that provide ability create or modificate data
+ */
 public class App {
     private static final Logger LOGGER = Logger.getLogger(FileHandler.class.getName());
 
+    /**
+     * The main method that serves as the entry point for the application.
+     * 
+     * @param g_args command-line arguments (not used)
+     */
     public static void main(String[] g_args) {
         Path dataFilePath = null;
         var history = new History();
@@ -37,7 +47,6 @@ public class App {
                 .register("remove_key", new RemoveKeyCommand())
                 .register("history", new HistoryCommand())
                 .register("insert", new InsertCommand())
-                .register("update", new UpdateCommand())
                 .register("save", new SaveCommand())
                 .register("execute_script", new ExecuteCommand())
                 .register("print_field_ascending_number_of_rooms", new FieldCommand())
@@ -51,7 +60,7 @@ public class App {
             dataFilePath = getDataFileFromEnv("LAB5_DATA");
             flats = new Reader().parseCSV(dataFilePath.toFile());
         } catch (IllegalArgumentException | IOException e) {
-            LOGGER.log(Level.WARNING, "There's error while loading file: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "There's error while loading file: {0}", e.getMessage());
             return;
         }
 
@@ -79,14 +88,22 @@ public class App {
         }
     }
 
+    /**
+     * Retrieves the path to the data file from the specified environment variable.
+     *
+     * @param envVariable the name of the environment variable that contains the
+     *                    file path
+     * @return the path to the data file
+     * @throws IOException              if an I/O error happens
+     * @throws IllegalArgumentException if the env variable is not set or invalid
+     */
     public static Path getDataFileFromEnv(String envVariable) throws IOException {
         String envPath = System.getenv(envVariable);
         final Path path;
 
-        if (envPath == null || envPath.trim().isEmpty()) {
+        if (envPath == null || envPath.trim().isEmpty())
             throw new IllegalArgumentException(
                     "Environment variable '" + envVariable + "' is not set or empty.");
-        }
 
         try {
             path = Paths.get(envPath);
@@ -97,18 +114,15 @@ public class App {
                     ex);
         }
 
-        if (!Files.exists(path)) {
+        if (!Files.exists(path))
             throw new IllegalArgumentException("The file at path '" + path + "' does not exist.");
-        }
 
-        if (!Files.isRegularFile(path)) {
+        if (!Files.isRegularFile(path))
             throw new IllegalArgumentException("The path '" + path + "' is not a file. Check twice!");
-        }
 
-        if (!Files.isReadable(path)) {
+        if (!Files.isReadable(path))
             throw new IllegalArgumentException("The file at path '" + path + "' is not readable. " +
                     "Check file permissions!");
-        }
 
         LOGGER.info("File '" + path + "' exists and is readable.");
         return path;
