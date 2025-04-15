@@ -10,6 +10,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import itmo.lab5.models.enums.*;
+import itmo.lab5.cli.helpers.FlatComparatorFactory;
 import itmo.lab5.models.*;
 
 public class Reader {
@@ -42,17 +43,13 @@ public class Reader {
       collection.put(parsedFlat.getId(), parsedFlat);
     }
 
-    collection = collection.entrySet()
-        .stream()
-        .sorted(HashMap.Entry.comparingByKey())
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            Map.Entry::getValue,
-            (oldValue, newValue) -> oldValue,
-            HashMap::new));
-
+    var sortedById = FlatComparatorFactory.sortFlats(
+            collection, 
+            FlatComparatorFactory.SortField.ID
+    );
+    
     scanner.close();
-    return collection;
+    return sortedById;
   }
 
   private static Flat parseFlat(String lineToParse) throws IllegalArgumentException, ParseException {
