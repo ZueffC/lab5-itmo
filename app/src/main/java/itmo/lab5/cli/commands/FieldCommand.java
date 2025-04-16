@@ -9,21 +9,24 @@ import java.util.stream.Collectors;
 
 /**
  * This class represents a command that processes a collection of Flat objects.
- * This command sorts the flats by the number of rooms and prints the sorted 
+ * This command sorts the flats by the number of rooms and prints the sorted
  * entries.
  * 
  * Implements the Command interface.
  */
 public class FieldCommand implements Command {
-  
+
   /**
-   * Executes the command, sorting and displaying the flats from the provided 
+   * Executes the command, sorting and displaying the flats from the provided
    * collection.
    *
-   * @param args an array of arguments passed to the command.
-   * @param context the context containing the collection of flats to be processed.
-   * @return a message indicating the result of the execution. If the collection is empty,
-   *         it returns "Nothing to show!". If the collection cannot be parsed, it returns
+   * @param args    an array of arguments passed to the command.
+   * @param context the context containing the collection of flats to be
+   *                processed.
+   * @return a message indicating the result of the execution. If the collection
+   *         is empty,
+   *         it returns "Nothing to show!". If the collection cannot be parsed, it
+   *         returns
    *         "Can't parse collection!".
    */
   @Override
@@ -36,17 +39,15 @@ public class FieldCommand implements Command {
       return "Can't parse collection!";
     }
 
-    if (collection.isEmpty()) {
+    if (collection.isEmpty())
       return "Nothing to show!";
-    }
 
     var sortedEntries = collection.entrySet().stream()
         .sorted(Comparator.comparingInt(entry -> entry.getValue().getNumberOfRooms()))
         .collect(Collectors.toList());
 
-    sortedEntries.forEach(entry ->
-      System.out.println("Key: " + entry.getKey() +
-          ", Rooms: " + entry.getValue().getNumberOfRooms()));
+    sortedEntries.forEach(entry -> System.out.println("Key: " + entry.getKey() +
+        ", Rooms: " + entry.getValue().getNumberOfRooms()));
 
     return "";
   }

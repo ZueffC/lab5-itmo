@@ -49,6 +49,7 @@ public class App {
                 .register("insert", new InsertCommand())
                 .register("save", new SaveCommand())
                 .register("execute_script", new ExecuteCommand())
+                .register("update", new UpdateCommand())
                 .register("print_field_ascending_number_of_rooms", new FieldCommand())
                 .register("filter_less_than_view", new FilterCommand("less"))
                 .register("filter_greater_than_view", new FilterCommand("greater"))
@@ -60,7 +61,7 @@ public class App {
             dataFilePath = getDataFileFromEnv("LAB5_DATA");
             flats = new Reader().parseCSV(dataFilePath.toFile());
         } catch (IllegalArgumentException | IOException e) {
-            LOGGER.log(Level.WARNING, "There's error while loading file: {0}", e.getMessage());
+            LOGGER.log(Level.WARNING, "There's error while loading file: " + e.getMessage());
             return;
         }
 

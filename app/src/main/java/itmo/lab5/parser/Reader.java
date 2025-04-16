@@ -22,9 +22,8 @@ public class Reader {
 
     if (scanner.hasNextLine()) {
       var currentLine = scanner.nextLine();
-      if (!currentLine.contains("id,name")) {
+      if (!currentLine.contains("id,name"))
         scanner = new Scanner(file);
-      }
     }
 
     while (scanner.hasNextLine()) {
@@ -44,10 +43,9 @@ public class Reader {
     }
 
     var sortedById = FlatComparatorFactory.sortFlats(
-            collection, 
-            FlatComparatorFactory.SortField.ID
-    );
-    
+        collection,
+        FlatComparatorFactory.SortField.ID);
+
     scanner.close();
     return sortedById;
   }
