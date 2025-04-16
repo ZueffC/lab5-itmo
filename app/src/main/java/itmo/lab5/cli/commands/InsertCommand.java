@@ -145,7 +145,7 @@ public class InsertCommand implements Command {
         Double area = params.containsKey("area") ? Double.parseDouble(params.get("area").replace(',', '.'))
                 : inputReader.promptNumber("\t Enter square: ", 0.0, 626.0, Double::parseDouble, null);
         int numberOfRooms = params.containsKey("numberOfRooms") ? Integer.parseInt(params.get("numberOfRooms"))
-                : inputReader.promptNumber("\t Enter rooms count: ", 1, Integer.MAX_VALUE, Integer::parseInt, null);
+                : inputReader.promptNumber("\t Enter rooms count: ", 1, 77, Integer::parseInt, null);
 
         System.out.println("- Furnish");
         Furnish furnish = null;
