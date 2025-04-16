@@ -28,7 +28,7 @@ public class Writer {
           System.out.println(e.getMessage());
         }
 
-        String line = String.format("%d,%s,%d,%d,%s,%f,%d,%s,%s,%s,%s,%d,%d\n",
+        String line = String.format("%d,%s,%d,%d,%s,%.5f,%d,%s,%s,%s,%s,%d,%d\n",
             flat.getId(),
             flat.getName(),
             flat.getCoordinates().getX(),
