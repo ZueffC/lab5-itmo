@@ -28,13 +28,13 @@ public class Writer {
           System.out.println(e.getMessage());
         }
 
-        String line = String.format("%d,%s,%d,%d,%s,%.5f,%d,%s,%s,%s,%s,%d,%d\n",
+        String line = String.format("%d,%s,%d,%d,%s,%s,%d,%s,%s,%s,%s,%d,%d\n",
             flat.getId(),
             flat.getName(),
             flat.getCoordinates().getX(),
             flat.getCoordinates().getY(),
             date,
-            flat.getArea(),
+            flat.getArea().toString().replace(",", "."),
             flat.getNumberOfRooms(),
             flat.getFurnish(),
             flat.getView() != null ? flat.getView() : "",
