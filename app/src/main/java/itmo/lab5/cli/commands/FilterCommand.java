@@ -17,6 +17,12 @@ import java.util.*;
 public class FilterCommand implements Command {
   private String classificator;
 
+  private static final String description = "command allows to filter collection's valus by provided classificator";
+
+  public final String toString() {
+    return this.description;
+  }
+
   /**
    * Constructs a FilterCommand with the specified classificator.
    *
@@ -30,8 +36,8 @@ public class FilterCommand implements Command {
    * Executes the command, filtering and displaying the flats from the
    * provided collection based on the threshold value.
    *
-   * @param args an array of arguments where the first element is the
-   *             threshold value for filtering.
+   * @param args    an array of arguments where the first element is the
+   *                threshold value for filtering.
    * @param context the context containing the collection of flats to be
    *                processed.
    * @return a message indicating the result of the execution. If no
@@ -62,14 +68,14 @@ public class FilterCommand implements Command {
     final int finalThreshold = threshold;
     if (classificator.equals("less")) {
       result = collection.values().stream()
-          .filter(flat -> flat.getView() != null && 
-                          flat.getView().ordinal() < finalThreshold)
+          .filter(flat -> flat.getView() != null &&
+              flat.getView().ordinal() < finalThreshold)
           .sorted(Comparator.comparingInt(flat -> flat.getView().ordinal()))
           .collect(Collectors.toList());
     } else {
       result = collection.values().stream()
-          .filter(flat -> flat.getView() != null && 
-                          flat.getView().ordinal() > finalThreshold)
+          .filter(flat -> flat.getView() != null &&
+              flat.getView().ordinal() > finalThreshold)
           .sorted(Comparator.comparingInt(flat -> flat.getView().ordinal()))
           .collect(Collectors.toList());
     }
@@ -79,4 +85,3 @@ public class FilterCommand implements Command {
     return "";
   }
 }
-

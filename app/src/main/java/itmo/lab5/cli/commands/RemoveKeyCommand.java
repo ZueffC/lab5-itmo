@@ -16,6 +16,11 @@ import itmo.lab5.models.Flat;
  * or the collection is empty, appropriate error messages are returned.
  */
 public class RemoveKeyCommand implements Command {
+    private static final String description = "command allows to delete collections element by providing element's id";
+
+    public final String toString() {
+        return this.description;
+    }
 
     /**
      * Executes the remove key command, deleting a flat by ID.

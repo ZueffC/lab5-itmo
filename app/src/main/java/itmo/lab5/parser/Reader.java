@@ -32,14 +32,14 @@ public class Reader {
 
       try {
         parsedFlat = parseFlat(currentLine);
+        collection.put(parsedFlat.getId(), parsedFlat);
       } catch (Exception e) {
-        throw new IllegalArgumentException(
+        System.out.println(
             "There's an error while trying to parse line: '"
                 + currentLine + "'; "
                 + "The error is: " + e.getMessage());
       }
 
-      collection.put(parsedFlat.getId(), parsedFlat);
     }
 
     var sortedById = FlatComparatorFactory.sortFlats(

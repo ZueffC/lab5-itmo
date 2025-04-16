@@ -14,6 +14,11 @@ import itmo.lab5.models.Flat;
  * and removes all items from it, effectively emptying the collection.
  */
 public class ClearCommand implements Command {
+    private static final String description = "command allows to clear collection";
+
+    public final String toString() {
+        return this.description;
+    }
 
     /**
      * Executes the clear command, removing all items from the collection

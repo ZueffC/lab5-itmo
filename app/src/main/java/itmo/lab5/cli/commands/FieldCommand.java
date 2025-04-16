@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
  * Implements the Command interface.
  */
 public class FieldCommand implements Command {
+  private static final String description = "command allows to see flat's id soted by their number of rooms";
+
+  public final String toString() {
+    return this.description;
+  }
 
   /**
    * Executes the command, sorting and displaying the flats from the provided

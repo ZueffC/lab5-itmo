@@ -13,6 +13,7 @@ import itmo.lab5.interfaces.Command;
  * If no commands are available, it informs user.
  */
 public class HelpCommand implements Command {
+    public static final String description = "help commands allows you to see all avaliable commands";
 
     /**
      * Executes the help command, returning a list of available commands.
@@ -32,12 +33,19 @@ public class HelpCommand implements Command {
             return result.toString();
         }
 
-        result.append("List of available commands: ");
-        registry.getAllCommands().keySet().forEach(command -> result.append(command).append(", "));
+        result.append("List of available commands: \n");
+
+        registry.getAllCommands().forEach((name, command) -> {
+            result.append("- ").append(name).append(": ").append(command.toString()).append("\n");
+        });
 
         return result
                 .delete(result.length() - 2, result.length())
                 .append(".")
                 .toString();
+    }
+
+    public final String toString() {
+        return this.description;
     }
 }

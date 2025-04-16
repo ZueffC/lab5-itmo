@@ -9,18 +9,25 @@ import itmo.lab5.models.Flat;
  * This class implements the Command interface and provides
  * functionality to display information about the collection.
  * 
- * When executed, this command retrieves the collection from the command context 
- * and returns details about the collection, including its type, the type of its 
+ * When executed, this command retrieves the collection from the command context
+ * and returns details about the collection, including its type, the type of its
  * items, and the number of items.
  */
 public class InfoCommand implements Command {
+    private static final String description = "command allows to see type of collections elements and collection holder type";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
-     * Executes the info command, returning information about the collection of 
+     * Executes the info command, returning information about the collection of
      * flats.
      *
-     * @param args an array of arguments passed to the command
+     * @param args    an array of arguments passed to the command
      * @param context the command context that contains the collection of flats
-     * @return a string containing information about the collection, or an error message if the collection cannot be parsed
+     * @return a string containing information about the collection, or an error
+     *         message if the collection cannot be parsed
      */
     @Override
     public String execute(String args[], CommandContext context) {

@@ -10,19 +10,25 @@ import itmo.lab5.cli.CommandContext;
  * This class implements the Command interface and provides
  * functionality to display the contents of the collection of Flat objects.
  * 
- * When executed, this command retrieves the collection from the command context 
- * and prints each Flat object to the standard output. If the collection is 
+ * When executed, this command retrieves the collection from the command context
+ * and prints each Flat object to the standard output. If the collection is
  * empty, it returns a message indicating that there is nothing to show.
  */
 public class ShowCommand implements Command {
-    
+    private static final String description = "command allows see all elements of the collection";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
      * Executes the show command, displaying the contents of the collection
      * of flats.
      *
-     * @param args an array of arguments passed to the command
+     * @param args    an array of arguments passed to the command
      * @param context the command context that contains the collection of flats
-     * @return an empty string if the collection is displayed successfully, or an error message if the collection cannot be parsed
+     * @return an empty string if the collection is displayed successfully, or an
+     *         error message if the collection cannot be parsed
      */
     @Override
     public String execute(String args[], CommandContext context) {

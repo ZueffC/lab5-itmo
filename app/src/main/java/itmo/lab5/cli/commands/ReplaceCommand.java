@@ -15,8 +15,12 @@ import java.util.HashMap;
  * Implements the {@link Command} interface.
  */
 public class ReplaceCommand implements Command {
-  
   private final String classificator;
+  private static final String description = "command allows to replace some value of element by it's id";
+
+  public final String toString() {
+    return this.description;
+  }
 
   /**
    * Constructs a ReplaceCommand with the specified classificator.
@@ -26,10 +30,10 @@ public class ReplaceCommand implements Command {
    * @throws IllegalArgumentException if the classificator is not valid.
    */
   public ReplaceCommand(String classificator) {
-    if (!classificator.equalsIgnoreCase("greater") && 
+    if (!classificator.equalsIgnoreCase("greater") &&
         !classificator.equalsIgnoreCase("lower")) {
       throw new IllegalArgumentException("Classificator must be either " +
-                                         "'greater' or 'lower'");
+          "'greater' or 'lower'");
     }
     this.classificator = classificator.toLowerCase();
   }
@@ -38,9 +42,9 @@ public class ReplaceCommand implements Command {
    * Executes the command, replacing a flat in the collection if the
    * specified condition is met.
    *
-   * @param args an array of arguments where the first element is the id
-   *             of the flat to be replaced, followed by optional parameters
-   *             for the new flat.
+   * @param args    an array of arguments where the first element is the id
+   *                of the flat to be replaced, followed by optional parameters
+   *                for the new flat.
    * 
    * @param context the context containing the collection of flats to be
    *                processed.
@@ -98,7 +102,7 @@ public class ReplaceCommand implements Command {
    * Builds a new Flat object from the provided arguments, using the
    * existing flat's properties as defaults.
    *
-   * @param args an array of arguments containing the new flat's properties.
+   * @param args    an array of arguments containing the new flat's properties.
    * @param oldFlat the existing flat to use as a reference for default values.
    * @return a new Flat object or null if the creation fails.
    */
@@ -154,7 +158,7 @@ public class ReplaceCommand implements Command {
       return null;
     }
   }
-  
+
   /**
    * Compares two Flat objects based on various attributes such as area,
    * number of rooms, furnish type, view, transport, and house details.
@@ -202,8 +206,8 @@ public class ReplaceCommand implements Command {
   /**
    * Safely compares two comparable objects, handling null values.
    *
-   * @param a the first object to compare.
-   * @param b the second object to compare.
+   * @param a   the first object to compare.
+   * @param b   the second object to compare.
    * @param <T> the type of the objects being compared, which must extend
    *            Comparable.
    *

@@ -24,6 +24,12 @@ public class InsertCommand implements Command {
     private final Scanner scanner = new Scanner(System.in);
     private final ReaderUtil inputReader = new ReaderUtil(scanner);
 
+    private static final String description = "command allows to insert data by passing it in k=v format or interactively";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
      * Executes the insert command, either interactively or with provided
      * arguments.

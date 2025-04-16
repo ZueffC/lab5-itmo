@@ -8,19 +8,25 @@ import itmo.lab5.cli.helpers.*;
  * This class implements the Command interface and provides
  * functionality to display the command history of the application.
  * 
- * When executed, this command retrieves the history from the command context 
- * and returns a string representation of the command history. If the history is 
+ * When executed, this command retrieves the history from the command context
+ * and returns a string representation of the command history. If the history is
  * null or cannot be parsed, an appropriate error message is returned.
  *
  */
 public class HistoryCommand implements Command {
-    
+    private static final String description = "command allows to see 8 previously called commands";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
      * Executes the history command, returning latest 8 (by design).
      *
-     * @param args an array of arguments passed to the command
+     * @param args    an array of arguments passed to the command
      * @param context the command context that contains the history of commands
-     * @return a string representation of the command history, or an error message if the history cannot be parsed
+     * @return a string representation of the command history, or an error message
+     *         if the history cannot be parsed
      */
     @Override
     public String execute(String args[], CommandContext context) {

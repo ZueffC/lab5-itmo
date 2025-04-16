@@ -21,6 +21,12 @@ import itmo.lab5.interfaces.*;
 public class ExecuteCommand implements Command {
     private static final Set<String> executingScripts = new HashSet<String>();
 
+    private static final String description = "command allows to execute stript by provided absolute path";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
      * Executes the script command, running the commands specified in the given
      * script file.

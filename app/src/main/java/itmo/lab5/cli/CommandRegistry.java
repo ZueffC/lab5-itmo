@@ -8,13 +8,13 @@ import itmo.lab5.interfaces.Command;
  * Manages the registration and retrieval of commands.
  */
 public class CommandRegistry {
-  
+
   private final Map<String, Command> commands = new HashMap<>();
 
   /**
    * Registers a new command with the specified name.
    *
-   * @param name the name of the command to register.
+   * @param name       the name of the command to register.
    * @param newCommand the command instance to register.
    */
   public void register(String name, Command newCommand) {

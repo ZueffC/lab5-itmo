@@ -11,6 +11,12 @@ import itmo.lab5.interfaces.Command;
  */
 public class ExitCommand implements Command {
 
+    private static final String description = "command allows to exit RELP";
+
+    public final String toString() {
+        return this.description;
+    }
+
     /**
      * Executes the exit command, terminating the application.
      *
