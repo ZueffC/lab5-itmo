@@ -37,6 +37,7 @@ public class FieldCommand implements Command {
   @Override
   public String execute(String args[], CommandContext context) {
     var collection = new HashMap<Integer, Flat>();
+    var result = new StringBuilder();
 
     try {
       collection = (HashMap<Integer, Flat>) context.get("collection");
@@ -51,9 +52,9 @@ public class FieldCommand implements Command {
         .sorted(Comparator.comparingInt(entry -> entry.getValue().getNumberOfRooms()))
         .collect(Collectors.toList());
 
-    sortedEntries.forEach(entry -> System.out.println("Key: " + entry.getKey() +
-        ", Rooms: " + entry.getValue().getNumberOfRooms()));
+    sortedEntries.forEach(entry -> result.append("Key: " + entry.getKey() +
+        ", Rooms: " + entry.getValue().getNumberOfRooms() + "\n"));
 
-    return "";
+    return result.toString().substring(0, result.length() - 2);
   }
 }

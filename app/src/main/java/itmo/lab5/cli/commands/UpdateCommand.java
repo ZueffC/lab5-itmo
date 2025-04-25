@@ -39,82 +39,163 @@ public class UpdateCommand implements Command {
     @Override
     public String execute(String[] args, CommandContext context) {
         if (args.length < 1)
-            return "Usage: update id {element}";
+            return "Can't update element without ID!";
 
-        Map<Integer, Flat> collection = null;
-
-        int idToUpdate;
+        HashMap<Integer, Flat> collection;
+        int id; 
+        
         try {
-            idToUpdate = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            return "Invalid ID format.";
+            id = Integer.parseInt(args[0]);
+        } catch(Exception e) {
+            return "You provided wrong id!";
         }
-
+        
         try {
-            collection = (Map<Integer, Flat>) context.get("collection");
+          collection = (HashMap<Integer, Flat>) context.get("collection");
         } catch (ClassCastException e) {
-            return "There's an error while trying to parse collection.";
+          return "Collection is corrupted or not found in context.";
         }
 
-        if (!collection.containsKey(idToUpdate))
-            return "No flat with ID: " + idToUpdate;
-
-        Flat oldFlat = collection.get(idToUpdate);
-
-        System.out.println("Updating flat with ID: " + idToUpdate);
-        String name = inputReader.promptString("- Enter name:", false, oldFlat.getName());
-
-        System.out.println("- Coordinates:");
-        int x = inputReader.promptNumber("\t Enter x:", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt,
-                oldFlat.getCoordinates().getX());
-        Long y = inputReader.promptNumber("\t Enter y:", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong,
-                oldFlat.getCoordinates().getY());
-        Coordinates coordinates = new Coordinates(x, y);
-
-        Double area = inputReader.promptNumber("\t Enter square:", 0.0, 626.0, Double::parseDouble, oldFlat.getArea());
-        int rooms = inputReader.promptNumber("\t Enter rooms count:", 1, Integer.MAX_VALUE, Integer::parseInt,
-                oldFlat.getNumberOfRooms());
-
-        System.out.println("- Furnish:");
-        Furnish furnish = inputReader.promptEnum("\t Enter furnish type:", Furnish.class, oldFlat.getFurnish());
-
-        System.out.println("- View:");
-        View view = inputReader.promptEnumNullable("\t Enter view type:", View.class, oldFlat.getView());
-
-        System.out.println("- Transport:");
-        Transport transport = inputReader.promptEnum("\t Enter transport type:", Transport.class,
-                oldFlat.getTransport());
-
-        System.out.println("- House:");
-        System.out.print("\t Enter house name: ");
-        String houseName = scanner.nextLine().trim();
-
-        House house = oldFlat.getHouse();
-        if (!houseName.isEmpty()) {
-            int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt,
-                    (house != null ? house.getYear() : 1));
-
-            long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong,
-                    (house != null ? house.getNumberOfFloors() : 1L));
-
-            house = new House(houseName, year, floors);
+        if (!collection.containsKey(id))
+          return "No element with id " + id;
+        
+        if(args.length > 1) {
+            var updatedFlat = updateByArgs(args, collection.get(id));
+            collection.put(id, updatedFlat);
         }
+        
+        return updateInteractive(context, id);
+    }
 
+    private String updateInteractive(CommandContext context, Integer id) {
         Date creationDate = new Date();
 
-        Flat updatedFlat = new Flat(
-                idToUpdate,
-                name,
-                coordinates,
-                creationDate,
-                area,
-                rooms,
-                furnish,
-                view,
-                transport,
-                house);
+        // Reading name from terminal then validating it (fix after first attempt)
+        String name = inputReader.promptString("- Enter name: ", false, null);
 
-        collection.put(idToUpdate, updatedFlat);
-        return "Flat with ID " + idToUpdate + " was successfully updated.";
+        // Reading coordinates from terminal then compares it to null (fix after first
+        // attempt)
+        System.out.println("- Coordinates ");
+
+        int x = inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt, null);
+        Long y = inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
+        var coordinates = new Coordinates(x, y);
+
+        // Reading flat area from terminal then validating it.
+        // Also renamed "square" -> "area" after first attempt
+        Double area = inputReader.promptNumber("\t Enter area: ", 0.0, 626.0, Double::parseDouble, null);
+        int numberOfRooms = inputReader.promptNumber("\t Enter numberOfRooms: ", 1, Integer.MAX_VALUE,
+                Integer::parseInt,
+                null);
+
+        // Reading FURNISH ENUM value from terminal
+        System.out.println("- Furnish (can't be empty)");
+
+        Furnish furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        while (furnish == null) {
+            System.out.println("\t Furnish can't be empty!");
+            furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        }
+
+        // Reading View ENUM from terminal, it can be empty
+        System.out.println("- View (can be empty)");
+        View view = inputReader.promptEnumNullable("\t Enter view type: ", View.class, null);
+
+        // Reading Transport Enum from terminal, it can't be empty
+        System.out.println("- Transport (can't be empty)");
+        Transport transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
+
+        while (transport == null) {
+            System.out.println("\t Transport can't be empty!");
+            transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
+        }
+
+        // Reading House values from terminal
+        // Strange situation: by the task field House in the Flat class can be null
+        // btw, the fields of House can't be null. So it seems like House can't be null
+        // anyway
+        House house = null;
+        System.out.println("- House");
+
+        String houseName = inputReader.promptString("\t Enter House name: ", false, null);
+        int year = inputReader.promptNumberNullable("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+        long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+
+        house = new House(houseName, year, floors);
+
+        try {
+            HashMap<Integer, Flat> collection = (HashMap<Integer, Flat>) context.get("collection");         
+            Flat flat = new Flat(
+                    id,
+                    name,
+                    coordinates,
+                    creationDate,
+                    area,
+                    numberOfRooms,
+                    furnish,
+                    view,
+                    transport,
+                    house);
+
+            collection.put(id, flat);
+        } catch (ClassCastException e) {
+            return "There's an error while trying to add new element. Collection is broken.";
+        }
+
+        return "New flat was successfully inserted!";
+    }
+    
+    private Flat updateByArgs(String[] args, Flat oldFlat) {
+        HashMap<String, String> params = new HashMap<>();
+        
+        for (String arg : args) {
+          String[] parts = arg.split("=", 2);
+
+          if (parts.length == 2)
+            params.put(parts[0], parts[1]);
+        }
+
+        try {
+          String name = params.getOrDefault("name", oldFlat.getName());
+
+          Coordinates coordinates = oldFlat.getCoordinates();
+          if (params.containsKey("x") || params.containsKey("y")) {
+            int x = params.containsKey("x") ? Integer.parseInt(params.get("x")) : coordinates.getX();
+            long y = params.containsKey("y") ? Long.parseLong(params.get("y")) : coordinates.getY();
+            coordinates = new Coordinates(x, y);
+          }
+
+          Double area = params.containsKey("area") ? Double.parseDouble(params.get("area")) : oldFlat.getArea();
+          int numberOfRooms = params.containsKey("numberOfRooms") ? Integer.parseInt(params.get("numberOfRooms"))
+              : oldFlat.getNumberOfRooms();
+          Furnish furnish = params.containsKey("furnish") ? Furnish.valueOf(params.get("furnish").toUpperCase())
+              : oldFlat.getFurnish();
+          View view = params.containsKey("view") ? View.valueOf(params.get("view").toUpperCase()) : oldFlat.getView();
+          Transport transport = params.containsKey("transport") ? Transport.valueOf(params.get("transport").toUpperCase())
+              : oldFlat.getTransport();
+
+          House house = oldFlat.getHouse();
+          if (params.containsKey("name") || params.containsKey("year") || params.containsKey("floors")) {
+            String houseName = params.containsKey("name") ? params.get("name") : house.getName();
+            int year = params.containsKey("year") ? Integer.parseInt(params.get("year")) : house.getYear();
+            long floors = params.containsKey("houseFloors") ? Long.parseLong(params.get("houseFloors"))
+                : house.getNumberOfFloors();
+            house = new House(houseName, year, floors);
+          }
+
+          return new Flat(
+              oldFlat.getId(),
+              name,
+              coordinates,
+              new Date(),
+              area,
+              numberOfRooms,
+              furnish,
+              view,
+              transport,
+              house);
+        } catch (NumberFormatException e) {
+          return null;
+      }
     }
 }

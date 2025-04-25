@@ -36,7 +36,12 @@ public class HelpCommand implements Command {
         result.append("List of available commands: \n");
 
         registry.getAllCommands().forEach((name, command) -> {
-            result.append("- ").append(name).append(": ").append(command.toString()).append("\n");
+            result
+                    .append("- ")
+                    .append(name)
+                    .append(": ")
+                    .append(command.toString())
+                    .append("\n");
         });
 
         return result

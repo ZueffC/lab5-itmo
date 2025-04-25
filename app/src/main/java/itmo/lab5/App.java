@@ -65,13 +65,12 @@ public class App {
             return;
         }
 
+        CommandInvoker invoker = new CommandInvoker(registry, context, history);
+        context.set("commandInvoker", invoker);
         context.set("registry", registry);
         context.set("collection", flats);
         context.set("history", history);
         context.set("path", dataFilePath.toString());
-
-        CommandInvoker invoker = new CommandInvoker(registry, context, history);
-        context.set("commandInvoker", invoker);
 
         var scanner = new Scanner(System.in);
         while (true) {

@@ -57,37 +57,59 @@ public class InsertCommand implements Command {
      */
     private String executeInteractive(CommandContext context) {
         Date creationDate = new Date();
+
+        // Reading name from terminal then validating it (fix after first attempt)
         String name = inputReader.promptString("- Enter name: ", false, null);
 
+        // Reading coordinates from terminal then compares it to null (fix after first
+        // attempt)
         System.out.println("- Coordinates ");
+
         int x = inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt, null);
         Long y = inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
         var coordinates = new Coordinates(x, y);
 
-        Double area = inputReader.promptNumber("\t Enter square: ", 0.0, 626.0, Double::parseDouble, null);
-        int numberOfRooms = inputReader.promptNumber("\t Enter rooms count: ", 1, Integer.MAX_VALUE, Integer::parseInt,
+        // Reading flat area from terminal then validating it.
+        // Also renamed "square" -> "area" after first attempt
+        Double area = inputReader.promptNumber("\t Enter area: ", 0.0, 626.0, Double::parseDouble, null);
+        int numberOfRooms = inputReader.promptNumber("\t Enter numberOfRooms: ", 1, Integer.MAX_VALUE,
+                Integer::parseInt,
                 null);
 
-        System.out.println("- Furnish");
-        Furnish furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        // Reading FURNISH ENUM value from terminal
+        System.out.println("- Furnish (can't be empty)");
 
-        System.out.println("- View");
+        Furnish furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        while (furnish == null) {
+            System.out.println("\t Furnish can't be empty!");
+            furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
+        }
+
+        // Reading View ENUM from terminal, it can be empty
+        System.out.println("- View (can be empty)");
         View view = inputReader.promptEnumNullable("\t Enter view type: ", View.class, null);
 
-        System.out.println("- Transport");
+        // Reading Transport Enum from terminal, it can't be empty
+        System.out.println("- Transport (can't be empty)");
         Transport transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
 
-        System.out.println("- House");
-        System.out.print("\t Enter house name: ");
-        String houseName = scanner.nextLine().trim();
-
-        House house = null;
-
-        if (!houseName.isEmpty()) {
-            int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
-            long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
-            house = new House(houseName, year, floors);
+        while (transport == null) {
+            System.out.println("\t Transport can't be empty!");
+            transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
         }
+
+        // Reading House values from terminal
+        // Strange situation: by the task field House in the Flat class can be null
+        // btw, the fields of House can't be null. So it seems like House can't be null
+        // anyway
+        House house = null;
+        System.out.println("- House");
+
+        String houseName = inputReader.promptString("\t Enter House name: ", false, null);
+        int year = inputReader.promptNumberNullable("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+        long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+
+        house = new House(houseName, year, floors);
 
         try {
             HashMap<Integer, Flat> collection = (HashMap<Integer, Flat>) context.get("collection");
