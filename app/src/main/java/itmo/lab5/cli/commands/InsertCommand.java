@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import itmo.lab5.cli.helpers.*;
 import itmo.lab5.cli.CommandContext;
 import itmo.lab5.interfaces.Command;
 import itmo.lab5.models.enums.*;
 import itmo.lab5.models.*;
+import itmo.lab5.cli.helpers.ReaderUtil;
 
 /**
  * This class implements the Command interface and provides
@@ -66,7 +66,8 @@ public class InsertCommand implements Command {
         System.out.println("- Coordinates ");
 
         int x = inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt, null);
-        Long y = inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
+        Double y = inputReader.promptNumber("\t Enter y: ", Double.MIN_VALUE, Double.MAX_VALUE, Double::parseDouble,
+                null);
         var coordinates = new Coordinates(x, y);
 
         // Reading flat area from terminal then validating it.
@@ -160,8 +161,10 @@ public class InsertCommand implements Command {
         int x = params.containsKey("x") ? Integer.parseInt(params.get("x"))
                 : inputReader.promptNumber("\t Enter x: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::parseInt,
                         null);
-        Long y = params.containsKey("y") ? Long.parseLong(params.get("y"))
-                : inputReader.promptNumber("\t Enter y: ", Long.MIN_VALUE, Long.MAX_VALUE, Long::parseLong, null);
+
+        Double y = params.containsKey("y") ? Double.parseDouble(params.get("y"))
+                : inputReader.promptNumber("\t Enter y: ", Double.MIN_VALUE, Double.MAX_VALUE, Double::parseDouble,
+                        null);
         var coordinates = new Coordinates(x, y);
 
         Double area = params.containsKey("area") ? Double.parseDouble(params.get("area").replace(',', '.'))
@@ -173,12 +176,12 @@ public class InsertCommand implements Command {
         Furnish furnish = null;
         if (params.containsKey("furnish")) {
             String value = params.get("furnish").toUpperCase();
-            while (!isValidEnumValue(Furnish.class, value)) {
+            while (!ReaderUtil.isValidEnumValue(Furnish.class, value)) {
                 System.out.println("Invalid furnish value: " + value + ". Please enter a valid furnish type.");
                 var t_furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
                 value = t_furnish.toString();
             }
-            furnish = (value.equalsIgnoreCase("NONE")) ? null : Furnish.valueOf(value);
+            furnish = Furnish.valueOf(value);
         } else {
             furnish = inputReader.promptEnum("\t Enter furnish type: ", Furnish.class, null);
         }
@@ -187,12 +190,13 @@ public class InsertCommand implements Command {
         View view = null;
         if (params.containsKey("view")) {
             String value = params.get("view").toUpperCase();
-            while (!isValidEnumValue(View.class, value)) {
+            while (!ReaderUtil.isValidEnumValue(View.class, value)) {
                 System.out.println("Invalid view value: " + value + ". Please enter a valid view type.");
                 var t_view = (View) inputReader.promptEnum("\t Enter furnish type: ", View.class, null);
                 value = t_view.toString();
             }
-            view = (value.equalsIgnoreCase("NONE")) ? null : View.valueOf(value);
+
+            view = View.valueOf(value);
         } else {
             view = inputReader.promptEnumNullable("\t Enter view type: ", View.class, null);
         }
@@ -201,32 +205,31 @@ public class InsertCommand implements Command {
         Transport transport = null;
         if (params.containsKey("transport")) {
             String value = params.get("transport").toUpperCase();
-            while (!isValidEnumValue(Transport.class, value)) {
+            while (!ReaderUtil.isValidEnumValue(Transport.class, value)) {
                 System.out.println("Invalid transport value: " + value + ". Please enter a valid transport type.");
                 var t_trapsport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
                 value = t_trapsport.toString();
             }
-            transport = (value.equalsIgnoreCase("NONE")) ? null : Transport.valueOf(value);
+
+            transport = Transport.valueOf(value);
         } else {
             transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
         }
 
         System.out.println("- House");
         String houseName = params.getOrDefault("houseName", "");
-        if (houseName.isEmpty()) {
+        while (houseName.isEmpty()) {
             System.out.print("\t Enter house name: ");
             houseName = scanner.nextLine().trim();
         }
 
         House house = null;
 
-        if (!houseName.isEmpty()) {
-            int year = params.containsKey("houseYear") ? Integer.parseInt(params.get("houseYear"))
-                    : inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
-            long floors = params.containsKey("houseFloors") ? Long.parseLong(params.get("houseFloors"))
-                    : inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
-            house = new House(houseName, year, floors);
-        }
+        int year = params.containsKey("houseYear") ? Integer.parseInt(params.get("houseYear"))
+                : inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+        long floors = params.containsKey("houseFloors") ? Long.parseLong(params.get("houseFloors"))
+                : inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+        house = new House(houseName, year, floors);
 
         try {
             HashMap<Integer, Flat> collection = (HashMap<Integer, Flat>) context.get("collection");
@@ -251,16 +254,4 @@ public class InsertCommand implements Command {
 
         return "New flat was successfully inserted!";
     }
-
-    public static <E extends Enum<E>> boolean isValidEnumValue(Class<E> enumClass, String value) {
-        if (value == null)
-            return false;
-
-        for (E constant : enumClass.getEnumConstants()) {
-            if (constant.name().equals(value))
-                return true;
-        }
-        return false;
-    }
-
 }

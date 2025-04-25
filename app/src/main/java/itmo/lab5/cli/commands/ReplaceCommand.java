@@ -121,7 +121,7 @@ public class ReplaceCommand implements Command {
       Coordinates coordinates = oldFlat.getCoordinates();
       if (params.containsKey("x") || params.containsKey("y")) {
         int x = params.containsKey("x") ? Integer.parseInt(params.get("x")) : coordinates.getX();
-        long y = params.containsKey("y") ? Long.parseLong(params.get("y")) : coordinates.getY();
+        double y = params.containsKey("y") ? Double.parseDouble(params.get("y")) : coordinates.getY();
         coordinates = new Coordinates(x, y);
       }
 

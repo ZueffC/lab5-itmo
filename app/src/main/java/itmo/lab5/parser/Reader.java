@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import itmo.lab5.models.enums.*;
 import itmo.lab5.cli.helpers.FlatComparatorFactory;
@@ -56,7 +54,7 @@ public class Reader {
 
     flat.setId(Integer.parseInt(values[0]));
     flat.setName(values[1]);
-    flat.setCoordinates(new Coordinates(Integer.parseInt(values[2]), Long.parseLong(values[3])));
+    flat.setCoordinates(new Coordinates(Integer.parseInt(values[2]), Double.parseDouble(values[3])));
     flat.setCreationDate(dateFormat.parse(values[4]));
     flat.setArea(Double.parseDouble(values[5]));
     flat.setNumberOfRooms(Integer.parseInt(values[6]));

@@ -28,11 +28,11 @@ public class Writer {
           System.out.println(e.getMessage());
         }
 
-        String line = String.format("%d,%s,%d,%d,%s,%s,%d,%s,%s,%s,%s,%d,%d\n",
+        String line = String.format("%d,%s,%d,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d\n",
             flat.getId(),
             flat.getName(),
             flat.getCoordinates().getX(),
-            flat.getCoordinates().getY(),
+            flat.getCoordinates().getY().toString().replace(",", "."),
             date,
             flat.getArea().toString().replace(",", "."),
             flat.getNumberOfRooms(),

@@ -80,8 +80,13 @@ public class FilterCommand implements Command {
           .collect(Collectors.toList());
     }
 
-    result.forEach(entry -> System.out.println(entry));
+    // Собираем результат в строку вместо прямого вывода
+    StringBuilder output = new StringBuilder();
+    for (Flat flat : result) {
+      output.append(flat.toString()).append("\n");
+    }
 
-    return "";
+    // Возвращаем собранный результат или сообщение, если список пуст
+    return output.length() > 0 ? output.toString() : "No matching flats found.";
   }
 }

@@ -5,9 +5,9 @@ package itmo.lab5.models;
  */
 public class Coordinates {
   private int x;
-  private Long y; // Поле не может быть null
+  private Double y; // Поле не может быть null
 
-  public Coordinates(int x, Long y) {
+  public Coordinates(int x, Double y) {
     this.x = x;
     this.y = y;
   }
@@ -16,7 +16,7 @@ public class Coordinates {
     this.x = x;
   }
 
-  public void setY(Long y) {
+  public void setY(Double y) {
     this.y = y;
   }
 
@@ -24,11 +24,11 @@ public class Coordinates {
     return this.x;
   }
 
-  public Long getY() {
+  public Double getY() {
     return this.y;
   }
 
   public String toString() {
-    return "Point(x = " + Integer.toString(x) + ", y = " + Long.toString(y) + ")";
+    return "Point(x = " + Integer.toString(x) + ", y = " + Double.toString(y) + ")";
   }
 }

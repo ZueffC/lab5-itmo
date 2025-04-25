@@ -2,43 +2,21 @@ package itmo.lab5.cli.commands;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
-import itmo.lab5.cli.CommandInvoker;
-import itmo.lab5.cli.CommandContext;
 import itmo.lab5.interfaces.*;
+import itmo.lab5.cli.*;
 
-/**
- * This class implements the Command} interface and provides
- * functionality to execute a script file containing a series of commands.
- *
- * When executed, this command reads commands from the specified script file and
- * executes them sequentially. It also checks for recursive script execution
- * to prevent infinite loops.
- */
 public class ExecuteCommand implements Command {
-    private static final Set<String> executingScripts = new HashSet<String>();
-
-    private static final String description = "command allows to execute stript by provided absolute path";
+    private static final Deque<String> executingScripts = new ArrayDeque<>();
+    private static final String description = "command allows to execute script by provided absolute path";
 
     public final String toString() {
         return this.description;
     }
 
-    /**
-     * Executes the script command, running the commands specified in the given
-     * script file.
-     *
-     * @param args    an array of arguments passed to the command, where the first
-     *                element is expected to be the name of the script file
-     * @param context the command context that contains the command invoker
-     * @return a string containing the output of the executed commands, or an error
-     *         message if the script file cannot be found or executed
-     */
     @Override
-    public String execute(String args[], CommandContext context) {
+    public String execute(String[] args, CommandContext context) {
         if (args.length < 1)
             return "Usage: execute_script <file_name>";
 
@@ -46,9 +24,9 @@ public class ExecuteCommand implements Command {
         File scriptFile = new File(fileName);
 
         if (executingScripts.contains(scriptFile.getAbsolutePath()))
-            return "Error: Recursive script execution detected for file: " + fileName;
+            return "Error: Cross-script recursion detected for file: " + fileName;
 
-        executingScripts.add(scriptFile.getAbsolutePath());
+        executingScripts.push(scriptFile.getAbsolutePath());
 
         try (Scanner fileScanner = new Scanner(scriptFile)) {
             CommandInvoker commandInvoker = (CommandInvoker) context.get("commandInvoker");
@@ -71,12 +49,11 @@ public class ExecuteCommand implements Command {
                             .append(e.getMessage()).append("\n");
                 }
             }
-
             return output.toString();
         } catch (FileNotFoundException e) {
             return "Error: Script file not found: " + fileName;
         } finally {
-            executingScripts.remove(scriptFile.getAbsolutePath());
+            executingScripts.pop();
         }
     }
 }

@@ -64,17 +64,30 @@ public class ReaderUtil {
                   .map(Enum::name).toList())
               + "): ");
 
-      String input = scanner.nextLine().trim();
-
-      if (input.isEmpty())
-        return oldValue;
+      String input = scanner.nextLine().trim().toUpperCase();
 
       try {
+        while (!isValidEnumValue(enumClass, input) || input.isEmpty()) {
+          System.out.print("\t Wrong input! Retry: ");
+          input = scanner.nextLine().trim().toUpperCase();
+        }
+
         return Enum.valueOf(enumClass, input.toUpperCase());
       } catch (IllegalArgumentException e) {
         System.out.println("Invalid name; Please, try again: ");
       }
     }
+  }
+
+  public static <E extends Enum<E>> boolean isValidEnumValue(Class<E> enumClass, String value) {
+    if (value == null)
+      return false;
+
+    for (E constant : enumClass.getEnumConstants()) {
+      if (constant.name().equals(value))
+        return true;
+    }
+    return false;
   }
 
   /**
