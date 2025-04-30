@@ -2,14 +2,11 @@ package itmo.lab5.parser;
 
 import itmo.lab5.cli.helpers.FlatComparatorFactory;
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import itmo.lab5.models.Flat;
 
 public class Writer {
-  static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
   public String writeCollection(String filename, HashMap<Integer, Flat> flats) {
     try (FileOutputStream fos = new FileOutputStream(filename);
         OutputStreamWriter osw = new OutputStreamWriter(fos);
@@ -23,7 +20,7 @@ public class Writer {
         String date = "";
 
         try {
-          date = dateFormat.format(flat.getCreationDate()).toString();
+          date = flat.getCreationDate().toString();
         } catch (Exception e) {
           System.out.println(e.getMessage());
         }

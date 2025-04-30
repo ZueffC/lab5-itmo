@@ -155,38 +155,6 @@ public class ReaderUtil {
     }
   }
 
-  /**
-   * Prompts the user for a number input within specified bounds.
-   *
-   * @param message  the message to display to the user.
-   * @param min      the minimum acceptable value.
-   * @param max      the maximum acceptable value.
-   * @param parser   the parser to convert input to the desired type.
-   * @param oldValue the previous value to display as a hint.
-   * @param <T>      the type of the number, which must be comparable.
-   * @return the user input as a number or the old value if input is empty.
-   */
-  public <T extends Comparable<T>> T promptNumberNullable(String message, T min, T max, Parser<T> parser, T oldValue) {
-    while (true) {
-      System.out.print(message + " (previosly: " + oldValue + ", might be from " + min + " and up to: " + max + "): ");
-      String input = scanner.nextLine().trim();
-
-      if (input.isEmpty())
-        return oldValue;
-
-      try {
-        T value = parser.parse(input);
-        if (value.compareTo(min) >= 0 && value.compareTo(max) <= 0)
-          return value;
-        else
-          return oldValue;
-      } catch (Exception e) {
-      }
-
-      System.out.println("Invalid value; Please, try again: ");
-    }
-  }
-
   public interface Parser<T> {
     T parse(String input) throws Exception;
   }

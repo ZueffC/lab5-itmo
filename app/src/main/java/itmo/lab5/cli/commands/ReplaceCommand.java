@@ -5,6 +5,7 @@ import itmo.lab5.interfaces.*;
 import itmo.lab5.models.*;
 import itmo.lab5.models.enums.*;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -143,11 +144,13 @@ public class ReplaceCommand implements Command {
         house = new House(houseName, year, floors);
       }
 
+      var currentDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
       return new Flat(
           oldFlat.getId(),
           name,
           coordinates,
-          new Date(),
+          currentDate,
           area,
           numberOfRooms,
           furnish,

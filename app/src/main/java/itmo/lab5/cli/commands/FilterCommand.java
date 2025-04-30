@@ -3,6 +3,7 @@ package itmo.lab5.cli.commands;
 import itmo.lab5.interfaces.*;
 import itmo.lab5.cli.*;
 import itmo.lab5.models.*;
+import itmo.lab5.models.enums.*;
 
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -15,7 +16,11 @@ import java.util.*;
  * Implements the Command interface.
  */
 public class FilterCommand implements Command {
-  private String classificator;
+  private final String classifier;
+
+  public FilterCommand(String classifier) {
+    this.classifier = classifier;
+  }
 
   private static final String description = "command allows to filter collection's valus by provided classificator";
 
@@ -23,70 +28,82 @@ public class FilterCommand implements Command {
     return this.description;
   }
 
-  /**
-   * Constructs a FilterCommand with the specified classificator.
-   *
-   * @param classificator the type of filtering to apply ("less" or "greater").
-   */
-  public FilterCommand(String classificator) {
-    this.classificator = classificator;
-  }
-
-  /**
-   * Executes the command, filtering and displaying the flats from the
-   * provided collection based on the threshold value.
-   *
-   * @param args    an array of arguments where the first element is the
-   *                threshold value for filtering.
-   * @param context the context containing the collection of flats to be
-   *                processed.
-   * @return a message indicating the result of the execution. If no
-   *         classificator is provided, it returns "There's no
-   *         classificator provided!". If the collection cannot be parsed,
-   *         it returns "Can't parse collection!". If the collection is
-   *         empty or the threshold is null, it returns "Nothing to show!".
-   */
   @Override
-  public String execute(String args[], CommandContext context) {
-    if (args.length < 1)
-      return "There's no classificator provided!";
-
-    var collection = new HashMap<Integer, Flat>();
-    Integer threshold = null;
-    List<Flat> result;
-
-    try {
-      collection = (HashMap<Integer, Flat>) context.get("collection");
-      threshold = Integer.valueOf(args[0]);
-    } catch (ClassCastException e) {
-      return "Can't parse collection!";
+  public String execute(String[] args, CommandContext context) {
+    if (args.length == 0) {
+      return "Usage: filter_less_than_view [view] / filter_greater_than_view [view]";
     }
 
-    if (collection.isEmpty() || threshold == null)
-      return "Nothing to show!";
+    HashMap<Integer, Flat> collection;
+    try {
+      collection = (HashMap<Integer, Flat>) context.get("collection");
+    } catch (ClassCastException e) {
+      return "Failed to retrieve collection.";
+    }
 
-    final int finalThreshold = threshold;
-    if (classificator.equals("less")) {
+    if (collection.isEmpty()) {
+      return "Collection is empty.";
+    }
+
+    String input = args[0].trim();
+    View targetView = parseViewInput(input);
+
+    if (targetView == null) {
+      return String.format("Invalid view value. Valid options are: %s", getValidViewOptions());
+    }
+
+    List<Flat> result;
+    if ("less".equalsIgnoreCase(classifier)) {
       result = collection.values().stream()
-          .filter(flat -> flat.getView() != null &&
-              flat.getView().ordinal() < finalThreshold)
-          .sorted(Comparator.comparingInt(flat -> flat.getView().ordinal()))
+          .filter(flat -> flat.getView() != null && flat.getView().ordinal() < targetView.ordinal())
           .collect(Collectors.toList());
     } else {
       result = collection.values().stream()
-          .filter(flat -> flat.getView() != null &&
-              flat.getView().ordinal() > finalThreshold)
-          .sorted(Comparator.comparingInt(flat -> flat.getView().ordinal()))
+          .filter(flat -> flat.getView() != null && flat.getView().ordinal() > targetView.ordinal())
           .collect(Collectors.toList());
     }
 
-    // Собираем результат в строку вместо прямого вывода
+    if (result.isEmpty()) {
+      return "No matching flats found.";
+    }
+
     StringBuilder output = new StringBuilder();
     for (Flat flat : result) {
       output.append(flat.toString()).append("\n");
     }
 
-    // Возвращаем собранный результат или сообщение, если список пуст
-    return output.length() > 0 ? output.toString() : "No matching flats found.";
+    return output.toString();
+  }
+
+  /**
+   * Parses the input string as either an ordinal index or as a case-insensitive
+   * enum name.
+   *
+   * @param input user-provided value representing a View enum.
+   * @return the corresponding View enum constant or null if invalid.
+   */
+  private View parseViewInput(String input) {
+    try {
+      int index = Integer.parseInt(input);
+      if (index >= 0 && index < View.values().length) {
+        return View.values()[index];
+      }
+    } catch (NumberFormatException ignored) {
+    }
+
+    try {
+      return View.valueOf(input.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
+
+  /**
+   * Returns a comma-separated list of valid View enum names.
+   *
+   * @return string representation of available View options.
+   */
+  private String getValidViewOptions() {
+    return String.join(", ", Arrays.stream(View.values()).map(Enum::name).toList());
   }
 }

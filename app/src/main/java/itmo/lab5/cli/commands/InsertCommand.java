@@ -1,5 +1,6 @@
 package itmo.lab5.cli.commands;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -26,6 +27,11 @@ public class InsertCommand implements Command {
 
     private static final String description = "command allows to insert data by passing it in k=v format or interactively";
 
+    /**
+     * Public function that returns class representation as a string
+     *
+     * @return string with description
+     */
     public final String toString() {
         return this.description;
     }
@@ -56,7 +62,7 @@ public class InsertCommand implements Command {
      * @return a message indicating the result of the operation
      */
     private String executeInteractive(CommandContext context) {
-        Date creationDate = new Date();
+        var creationDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         // Reading name from terminal then validating it (fix after first attempt)
         String name = inputReader.promptString("- Enter name: ", false, null);
@@ -93,8 +99,7 @@ public class InsertCommand implements Command {
         // Reading Transport Enum from terminal, it can't be empty
         System.out.println("- Transport (can't be empty)");
         Transport transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
-
-        while (transport == null) {
+        while (transport == null || transport.name() == "NONE") {
             System.out.println("\t Transport can't be empty!");
             transport = inputReader.promptEnum("\t Enter transport type: ", Transport.class, null);
         }
@@ -106,9 +111,9 @@ public class InsertCommand implements Command {
         House house = null;
         System.out.println("- House");
 
-        String houseName = inputReader.promptString("\t Enter House name: ", false, null);
-        int year = inputReader.promptNumberNullable("\t Enter house age: ", 1, 959, Integer::parseInt, null);
-        long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+        String houseName = inputReader.promptString("\t Enter house name: ", false, null);
+        int year = inputReader.promptNumber("\t Enter house year: ", 1, 959, Integer::parseInt, null);
+        long floors = inputReader.promptNumber("\t Enter house numberOfFloors: ", 1L, 77L, Long::parseLong, null);
 
         house = new House(houseName, year, floors);
 
@@ -153,7 +158,7 @@ public class InsertCommand implements Command {
                 params.put(parts[0], parts[1]);
         }
 
-        Date creationDate = new Date();
+        var creationDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         String name = params.containsKey("name") ? params.get("name")
                 : inputReader.promptString("- Enter name: ", false, null);
 
@@ -168,9 +173,9 @@ public class InsertCommand implements Command {
         var coordinates = new Coordinates(x, y);
 
         Double area = params.containsKey("area") ? Double.parseDouble(params.get("area").replace(',', '.'))
-                : inputReader.promptNumber("\t Enter square: ", 0.0, 626.0, Double::parseDouble, null);
+                : inputReader.promptNumber("\t Enter area: ", 0.0000000001, 626.0, Double::parseDouble, null);
         int numberOfRooms = params.containsKey("numberOfRooms") ? Integer.parseInt(params.get("numberOfRooms"))
-                : inputReader.promptNumber("\t Enter rooms count: ", 1, 77, Integer::parseInt, null);
+                : inputReader.promptNumber("\t Enter numberOfRooms: ", 1, 77, Integer::parseInt, null);
 
         System.out.println("- Furnish");
         Furnish furnish = null;
@@ -226,9 +231,9 @@ public class InsertCommand implements Command {
         House house = null;
 
         int year = params.containsKey("houseYear") ? Integer.parseInt(params.get("houseYear"))
-                : inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+                : inputReader.promptNumber("\t Enter house year: ", 1, 959, Integer::parseInt, null);
         long floors = params.containsKey("houseFloors") ? Long.parseLong(params.get("houseFloors"))
-                : inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
+                : inputReader.promptNumber("\t Enter house numberOfFloors: ", 1L, 77L, Long::parseLong, null);
         house = new House(houseName, year, floors);
 
         try {

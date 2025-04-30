@@ -3,18 +3,19 @@ package itmo.lab5.models;
 import itmo.lab5.models.enums.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Represents a flat, provided by se.ifmo.ru (no 462025)
  */
-public class Flat {
+public class Flat implements Comparable<Flat> {
   private int id; // Значение поля должно быть больше 0, Значение этого поля должно быть
                   // уникальным, Значение этого поля должно генерироваться автоматически
   private String name; // Поле не может быть null, Строка не может быть пустой
   private Coordinates coordinates; // Поле не может быть null
-  private Date creationDate; // Поле не может быть null, Значение этого поля должно генерироваться
-                             // автоматически
+  private LocalDate creationDate; // Поле не может быть null, Значение этого поля должно генерироваться
+  // автоматически
   private Double area; // Максимальное значение поля: 626, Значение поля должно быть больше 0
   private int numberOfRooms; // Значение поля должно быть больше 0
   private Furnish furnish; // Поле не может быть null
@@ -25,18 +26,23 @@ public class Flat {
   /**
    * Constructs a Flat object with the specified attributes.
    *
-   * @param id the unique identifier of the flat (must be greater than 0).
-   * @param name the name of the flat (must not be null or empty).
-   * @param coordinates the coordinates of the flat (must not be null).
-   * @param creationDate the creation date of the flat (must not be null).
-   * @param area the area of the flat (must be greater than 0 and less than or equal to 626).
-   * @param numberOfRooms the number of rooms in the flat (must be greater than 0).
-   * @param furnish the furnish type of the flat (must not be null).
-   * @param view the view from the flat (can be null).
-   * @param transport the transport type associated with the flat (must not be null).
-   * @param house the house details associated with the flat (can be null).
+   * @param id            the unique identifier of the flat (must be greater than
+   *                      0).
+   * @param name          the name of the flat (must not be null or empty).
+   * @param coordinates   the coordinates of the flat (must not be null).
+   * @param creationDate  the creation date of the flat (must not be null).
+   * @param area          the area of the flat (must be greater than 0 and less
+   *                      than or equal to 626).
+   * @param numberOfRooms the number of rooms in the flat (must be greater than
+   *                      0).
+   * @param furnish       the furnish type of the flat (must not be null).
+   * @param view          the view from the flat (can be null).
+   * @param transport     the transport type associated with the flat (must not be
+   *                      null).
+   * @param house         the house details associated with the flat (can be
+   *                      null).
    */
-  public Flat(int id, String name, Coordinates coordinates, Date creationDate, Double area,
+  public Flat(int id, String name, Coordinates coordinates, LocalDate creationDate, Double area,
       int numberOfRooms, Furnish furnish, View view, Transport transport, House house) {
     this.id = id;
     this.name = name;
@@ -49,7 +55,7 @@ public class Flat {
     this.transport = transport;
     this.house = house;
   }
-  
+
   /**
    * Default constructor for creating an empty Flat object.
    */
@@ -74,7 +80,7 @@ public class Flat {
   public void setId(int id) {
     this.id = id;
   }
-  
+
   /**
    * Gets the name of the flat.
    *
@@ -116,7 +122,7 @@ public class Flat {
    *
    * @return the creation date of the flat (must not be null).
    */
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
@@ -125,14 +131,15 @@ public class Flat {
    *
    * @param creationDate the new creation date of the flat (must not be null).
    */
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
-  
+
   /**
    * Gets the area of the flat.
    *
-   * @return the area of the flat (must be greater than 0 and less than or equal to 626).
+   * @return the area of the flat (must be greater than 0 and less than or equal
+   *         to 626).
    */
   public Double getArea() {
     return area;
@@ -141,12 +148,13 @@ public class Flat {
   /**
    * Sets the area of the flat.
    *
-   * @param area the new area of the flat (must be greater than 0 and less than or equal to 626).
+   * @param area the new area of the flat (must be greater than 0 and less than or
+   *             equal to 626).
    */
   public void setArea(Double area) {
     this.area = area;
   }
-  
+
   /**
    * Gets the number of rooms in the flat.
    *
@@ -159,7 +167,8 @@ public class Flat {
   /**
    * Sets the number of rooms in the flat.
    *
-   * @param numberOfRooms the new number of rooms in the flat (must be greater than 0).
+   * @param numberOfRooms the new number of rooms in the flat (must be greater
+   *                      than 0).
    */
   public void setNumberOfRooms(int numberOfRooms) {
     this.numberOfRooms = numberOfRooms;
@@ -205,50 +214,49 @@ public class Flat {
    * Gets the transport type associated with the flat.
    *
    * @return the transport type associated with this class
-   */ 
+   */
   public Transport getTransport() {
     return transport;
   }
-  
-  
- /**
-  * Sets the transport associated with this flat.
-  *
-  * @param transport the transport to be set
-  */
+
+  /**
+   * Sets the transport associated with this flat.
+   *
+   * @param transport the transport to be set
+   */
   public void setTransport(Transport transport) {
     this.transport = transport;
   }
-  
- /**
-  * Returns the house associated with this flat.
-  *
-  * @return the house
-  */
+
+  /**
+   * Returns the house associated with this flat.
+   *
+   * @return the house
+   */
   public House getHouse() {
     return house;
   }
 
- /**
-  * Sets the house associated with this flat.
-  *
-  * @param house the house to be set
-  */
+  /**
+   * Sets the house associated with this flat.
+   *
+   * @param house the house to be set
+   */
   public void setHouse(House house) {
     this.house = house;
   }
-  
- /**
-  * Returns a string representation of the flat, including its ID, name,
-  * coordinates, creation date, area, number of rooms, furnishing status,
-  * view, transport, and house.
-  *
-  * @return a string representation of the flat
-  */
+
+  /**
+   * Returns a string representation of the flat, including its ID, name,
+   * coordinates, creation date, area, number of rooms, furnishing status,
+   * view, transport, and house.
+   *
+   * @return a string representation of the flat
+   */
   @Override
   public String toString() {
-    var sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    var dateFormat = (creationDate == null) ? "null" : sdf.format(creationDate);
+    var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    var dateFormat = (creationDate == null) ? "null" : creationDate.toString();
     var builder = new StringBuilder();
 
     builder
@@ -265,5 +273,10 @@ public class Flat {
         .append("  House: ").append(house != null ? house.toString() : "null").append("\n");
 
     return builder.toString();
+  }
+
+  @Override
+  public int compareTo(Flat o) {
+    return Integer.compare(this.id, o.id);
   }
 }

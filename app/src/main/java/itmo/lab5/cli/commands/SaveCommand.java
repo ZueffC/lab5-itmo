@@ -4,6 +4,11 @@ import itmo.lab5.interfaces.Command;
 import itmo.lab5.cli.*;
 import itmo.lab5.models.*;
 import itmo.lab5.parser.Writer;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
@@ -35,21 +40,62 @@ public class SaveCommand implements Command {
      *         message if the collection or file path cannot be parsed
      */
     @Override
-    public String execute(String args[], CommandContext context) {
-        var writer = new Writer();
-        var collection = new HashMap<Integer, Flat>();
-        String filePath = null;
+    public String execute(String[] args, CommandContext context) {
+        HashMap<Integer, Flat> collection;
+        String filePath;
 
         try {
+            // Получаем коллекцию и путь к файлу из контекста
             collection = (HashMap<Integer, Flat>) context.get("collection");
             filePath = (String) context.get("path");
+
         } catch (ClassCastException e) {
-            return "Can't parse collection!";
+            return "Error: Collection or file path could not be retrieved from context.";
         }
 
-        if (filePath != null && collection != null)
-            return writer.writeCollection(filePath, collection);
-        else
-            return "Can't parse some object! Check filePath!";
+        if (filePath == null || filePath.isBlank()) {
+            return "Error: File path is not defined.";
+        }
+
+        Path path = Paths.get(filePath);
+
+        try {
+            checkWritePermissions(path);
+            new Writer().writeCollection(path.toString(), collection);
+            return "Collection has been written!";
+        } catch (SecurityException | IllegalArgumentException e) {
+            return "Access denied: " + e.getMessage();
+        } catch (IOException e) {
+            return "An I/O error occurred while saving the collection: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Checks whether the application can write to the given file.
+     *
+     * @param path the file path to check
+     * @throws SecurityException if access is denied
+     * @throws IOException       if an I/O error occurs
+     */
+    private void checkWritePermissions(Path path) throws IOException {
+        if (Files.exists(path)) {
+            if (Files.isDirectory(path)) {
+                throw new SecurityException("Path is a directory: " + path);
+            }
+            if (!Files.isWritable(path)) {
+                throw new SecurityException("File is not writable: " + path);
+            }
+        } else {
+            Path parentDir = path.getParent();
+            if (parentDir == null || !Files.exists(parentDir)) {
+                throw new SecurityException("Parent directory does not exist: " + parentDir);
+            }
+            if (!Files.isDirectory(parentDir)) {
+                throw new SecurityException("Parent path is not a directory: " + parentDir);
+            }
+            if (!Files.isWritable(parentDir)) {
+                throw new SecurityException("Directory is not writable: " + parentDir);
+            }
+        }
     }
 }

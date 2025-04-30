@@ -1,5 +1,6 @@
 package itmo.lab5.cli.commands;
 
+import java.time.ZoneId;
 import java.util.*;
 
 import itmo.lab5.cli.helpers.*;
@@ -61,6 +62,9 @@ public class UpdateCommand implements Command {
 
         if (args.length > 1) {
             var updatedFlat = updateByArgs(args, collection.get(id));
+            if (updatedFlat == null)
+                return "Failed to update flat from arguments.";
+
             collection.put(id, updatedFlat);
             return "The id=" + id + " flat was successfully updated!";
         }
@@ -69,7 +73,7 @@ public class UpdateCommand implements Command {
     }
 
     private String updateInteractive(CommandContext context, Integer id) {
-        Date creationDate = new Date();
+        var creationDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         // Reading name from terminal then validating it (fix after first attempt)
         String name = inputReader.promptString("- Enter name: ", false, null);
@@ -120,7 +124,7 @@ public class UpdateCommand implements Command {
         System.out.println("- House");
 
         String houseName = inputReader.promptString("\t Enter House name: ", false, null);
-        int year = inputReader.promptNumberNullable("\t Enter house age: ", 1, 959, Integer::parseInt, null);
+        int year = inputReader.promptNumber("\t Enter house age: ", 1, 959, Integer::parseInt, null);
         long floors = inputReader.promptNumber("\t Enter house floors count: ", 1L, 77L, Long::parseLong, null);
 
         house = new House(houseName, year, floors);
@@ -138,6 +142,9 @@ public class UpdateCommand implements Command {
                     view,
                     transport,
                     house);
+
+            if (flat == null)
+                return "Failed to update flat from arguments.";
 
             collection.put(id, flat);
         } catch (ClassCastException e) {
@@ -188,11 +195,13 @@ public class UpdateCommand implements Command {
                 house = new House(houseName, year, floors);
             }
 
+            var currentDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
             return new Flat(
                     oldFlat.getId(),
                     name,
                     coordinates,
-                    new Date(),
+                    currentDate,
                     area,
                     numberOfRooms,
                     furnish,
